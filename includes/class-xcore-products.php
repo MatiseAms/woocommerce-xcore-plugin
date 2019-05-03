@@ -125,6 +125,12 @@ class Xcore_Products extends WC_REST_Products_Controller
         return $result;
     }
 
+    public function create_item($request)
+    {
+		error_log('dont create anything!');
+		return $response = rest_ensure_response();
+    }
+
     public function update_item($request)
     {
         $object = $this->get_object((int)$request['id']);
