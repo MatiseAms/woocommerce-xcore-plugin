@@ -4,7 +4,7 @@ defined('ABSPATH') || exit;
 
 class Xcore
 {
-    private          $_version         = '1.5.3';
+    private          $_version         = '1.5.4';
     protected static $_instance        = null;
     protected static $_productInstance = null;
 
