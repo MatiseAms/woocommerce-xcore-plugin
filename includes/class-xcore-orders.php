@@ -57,6 +57,91 @@ class Xcore_Orders extends WC_REST_Orders_Controller
         $response = parent::get_item($request);
         $types = ['line_items', 'shipping_lines', 'fee_lines'];
 
+        foreach ($response->data['line_items'] as $line_key => $line_item) {
+            $has_embroidery_1 = false;
+            $has_embroidery_2 = false;
+            foreach ($line_item['meta_data'] as $meta_key => $meta_data) {
+                if($meta_data->get_data()['key'] === 'text1'){
+                    error_log('Embroidery line 1: '.$meta_data->get_data()['value']);
+                    $has_embroidery_1 = true;
+                }
+                if(strpos($meta_data->get_data()['key'], 'text2') > -1){
+                    error_log('Embroidery line 2: '.$meta_data->get_data()['value']);
+                    $has_embroidery_2 = true;
+                }
+                if($meta_data->get_data()['key'] === 'font'){
+                    error_log('Font: '.$meta_data->get_data()['value']);
+                }
+                if($meta_data->get_data()['key'] === 'color' && $has_embroidery_1){
+                    error_log('Color: '.$meta_data->get_data()['value']);
+                }
+                if($meta_data->get_data()['key'] === 'position'){
+                    error_log('Position: '.$meta_data->get_data()['value']);
+                }
+
+            }
+
+            if($has_embroidery_1){
+                $response->data['line_items'][$line_key]['price'] = $response->data['line_items'][$line_key]['price'] - 12.95;
+                $response->data['line_items'][] = [
+                    "id" => 0,
+                    "name" => "Embroidery line 1",
+                    "product_id" => 0,
+                    "variation_id" => 0,
+                    "quantity" => 1,
+                    "tax_class" => "",
+                    "subtotal" => "12.95",
+                    "subtotal_tax" => "2.72",
+                    "total" => "12.95",
+                    "total_tax" => "2.72",
+                    "taxes" => [
+                        [
+                            "id" => 21,
+                            "rate" => "21.0000",
+                            "total" => "2.72",
+                            "subtotal" => "2.72"
+                        ]
+                    ],
+                    "meta_data" => [],
+                    "sku" => "9810670001101",
+                    "price" => 12.95,
+                    "bundled_by" => "",
+                    "bundled_item_title" => "",
+                    "bundled_items" => []
+                ];
+            }
+            if($has_embroidery_2){
+                $response->data['line_items'][$line_key]['price'] = $response->data['line_items'][$line_key]['price'] - 3.5;
+                $response->data['line_items'][] = [
+                    "id" => 0,
+                    "name" => "Embroidery line 2",
+                    "product_id" => 0,
+                    "variation_id" => 0,
+                    "quantity" => 1,
+                    "tax_class" => "",
+                    "subtotal" => "3.50",
+                    "subtotal_tax" => "0.74",
+                    "total" => "3.50",
+                    "total_tax" => "0.74",
+                    "taxes" => [
+                        [
+                            "id" => 21,
+                            "rate" => "21.0000",
+                            "total" => "0.74",
+                            "subtotal" => "0.74"
+                        ]
+                    ],
+                    "meta_data" => [],
+                    "sku" => "9810670001102",
+                    "price" => 3.50,
+                    "bundled_by" => "",
+                    "bundled_item_title" => "",
+                    "bundled_items" => []
+                ];
+            }
+        }
+
+
         foreach($types as $type) {
             Xcore_Helper::add_tax_rate($response->data, $type);
         }

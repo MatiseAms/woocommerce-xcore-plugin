@@ -149,6 +149,11 @@ class Xcore_Products extends WC_REST_Products_Controller
         return $result;
     }
 
+    public function create_item($request)
+    {
+        return $response = rest_ensure_response('');
+    }
+
     /**
      * @param WP_REST_Request $request
      * @return WP_Error|WP_REST_Response
@@ -161,22 +166,41 @@ class Xcore_Products extends WC_REST_Products_Controller
             return new WP_Error( '404', 'No item found with ID: '. $request['id'], array( 'status' => '404' ));
         }
 
+        $product = false;
         if ($object->is_type('variation')) {
             $product = new WC_Product_Variation($request['id']);
-
-            if(isset($request['stock_quantity'])) {
+        } else if($object->is_type('simple')){
+            $product = new WC_Product_Simple($request['id']);
+        }
+        if($product){
+            if(isset($request['stock_quantity'])){
                 $product->set_stock_quantity($request['stock_quantity']);
             }
-
-            if(isset($request['manage_stock'])) {
+            if(isset($request['manage_stock'])){
                 $product->set_manage_stock($request['manage_stock']);
             }
-
-            if(isset($request['backorders'])) {
+            if(isset($request['regular_price'])){
+                $product->set_regular_price($request['regular_price']);
+            }
+            if(isset($request['tax_class'])){
+                $product->set_tax_class($request['tax_class']);
+            }
+            if(isset($request['weight'])){
+                $product->set_weight($request['weight']);
+            }
+            if(isset($request['catalog_visibility'])){
+                $product->set_catalog_visibility($request['catalog_visibility']);
+            }
+            if(isset($request['backorders'])){
                 $product->set_backorders($request['backorders']);
             }
-
+            $product->set_stock_status();
             $product->save();
+
+            // trigger an update (for example to let polylang sync products between languages)
+            if(has_action('woocommerce_update_product')){
+                do_action( 'woocommerce_update_product', $product->get_id() );
+            }
 
             return parent::prepare_object_for_response($product, $request);
         }
