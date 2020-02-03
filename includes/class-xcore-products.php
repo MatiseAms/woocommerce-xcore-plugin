@@ -130,7 +130,7 @@ class Xcore_Products extends WC_REST_Products_Controller
     {
         $limit = (int)$request['limit'] ?: 50;
         $date  = $request['date_modified'] ?: '2001-01-01 00:00:00';
-
+        error_log('whoop');
         $products = new WP_Query(array(
                                      'numberposts'    => -1,
                                      'post_type'      => array('product', 'product_variation'),
