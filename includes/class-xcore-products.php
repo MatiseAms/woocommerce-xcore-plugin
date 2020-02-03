@@ -110,12 +110,15 @@ class Xcore_Products extends WC_REST_Products_Controller
 
         $class  = WC_Product_Factory::get_classname_from_product_type($result->data['type']);
         $object = new $class(null);
-
         if ($object instanceof WC_Product_Variation) {
             $result->data['xcore_is_variation'] = true;
         } else {
             $result->data['xcore_is_variation'] = false;
         }
+
+
+        $result->data['price'] = $result->data['regular_price']; // Dennis zijn hack
+
 
         return $result;
     }
@@ -130,7 +133,7 @@ class Xcore_Products extends WC_REST_Products_Controller
     {
         $limit = (int)$request['limit'] ?: 50;
         $date  = $request['date_modified'] ?: '2001-01-01 00:00:00';
-        error_log('whoop');
+
         $products = new WP_Query(array(
                                      'numberposts'    => -1,
                                      'post_type'      => array('product', 'product_variation'),
